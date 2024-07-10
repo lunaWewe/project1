@@ -1,209 +1,195 @@
-// 使用 JSON.stringify 将对象转换为字符串
-Cookies.set("Product", JSON.stringify({
-    "productName": "lamp",
-    "price": 3000,
-    "seller": "awee"
-}));
-
-// Fetch the JSON file and handle the response
-fetch("users.json")
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not ok " + response.statusText);
-        }
-        return response.json();
-    })
-    .then(data => {
-        data.forEach((e)=>{
-            console.log(e.email)
-        if(e.email==="123@gmail.com"){
-            console.log(e.password)
-
-            if(e.password===123456){
-                console.log("ok")
-                Cookies.set("userId",1)
-            }
-            
-        }else {
-            return "failed";
-        }
-        return "failed";
-        })
-        
-    })
-    .catch(error => {
-        console.error("There has been a problem with your fetch operation:", error);
-    });
-
-
-    
-
-// 檢查是否支援local storage
-if (typeof(Storage) !== "undefined") {
-    console.log("Local Storage is supported.");
-} else {
-    console.log("Local Storage is not supported.");
-}
-
-
-// 使用 JSON.parse 将字符串转换回对象
-const product = JSON.parse(Cookies.get("Product"));
-console.log(product.price); // 输出 3000
+let products = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    const blocks = document.querySelectorAll('.block');
-    const container = document.querySelector('.block-container');
+    const productContainer = document.getElementById('product-container');
+    const sortPriceSelect = document.getElementById('sortPrice');
+    const checkoutButton = document.getElementById('checkout');
 
-    let draggedElement = null;
-
-    blocks.forEach(block => {
-        block.addEventListener('dragstart', (e) => {
-            draggedElement = block;
-            block.classList.add('dragging');
-        });
-
-        block.addEventListener('dragend', () => {
-            draggedElement = null;
-            block.classList.remove('dragging');
-        });
+    fetchProducts().then(fetchedProducts => {
+        products = fetchedProducts;
+        displayProducts(products, productContainer);
+        updateProductCount(products);
     });
 
-    // container.addEventListener('dragover', (e) => {
-    //     e.preventDefault();
-    //     const afterElement = getDragAfterElement(container, e.clientY);
-    //     if (afterElement == null) {
-    //         container.appendChild(draggedElement);
-    //     } else {
-    //         container.insertBefore(draggedElement, afterElement);
-    //     }
-    // });
+    sortPriceSelect.addEventListener('change', (event) => {
+        const sortOrder = event.target.value;
+        sortProductsByPrice(products, sortOrder);
+    });
 
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.block:not(.dragging)')];
+    checkoutButton.addEventListener('click', handleCheckout);
 
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
+    displayCart();
 });
 
-
-// topBtn
-window.onscroll = function () {
-    toggleScrollToTopBtn();
-};
-
-function toggleScrollToTopBtn() {
-    var btn = document.getElementById("scrollToTopBtn");
-    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-        btn.style.display = "block";
-    } else {
-        btn.style.display = "none";
-    }
+function fetchProducts() {
+    return fetch('products.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Error fetching product data:', error);
+            return [];
+        });
 }
 
-function scrollToTop() {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+function displayProducts(products, container) {
+    container.innerHTML = ''; // 清空現有的內容
+
+    products.forEach(product => {
+        const productCard = createProductCard(product);
+        container.innerHTML += productCard;
     });
 }
 
-// Carousal
-const buttons = document.querySelectorAll("[data-carousel-button]");
+function createProductCard(product) {
+    return `
+        <article class="product-card">
+            <div class="product-img">
+                <a href="#"><img src="${product.image}" alt="${product.name}"></a>
+            </div>
+            <div class="product-info">
+                <a href="#" class="product-name">${product.name}</a>
+                <a href="#" class="product-price">NT$${product.price}</a>
+                <a href="#" class="product-seller">${product.seller}</a>
+                <button class="TocartBtn" onclick="addToCart(${product.id})">加入購物車</button>
+            </div>
+        </article>
+    `;
+}
 
+function updateProductCount(products) {
+    const productCountElement = document.getElementById('product-count');
+    productCountElement.textContent = products.length; // 更新商品數量
+}
+
+function sortProductsByPrice(products, sortOrder) {
+    products.sort((a, b) => {
+        if (sortOrder === 'price,asc') {
+            return a.price - b.price;
+        } else if (sortOrder === 'price,desc') {
+            return b.price - a.price;
+        }
+        return 0;
+    });
+    displayProducts(products, document.getElementById('product-container'));
+}
+
+
+// 購物車
+function addToCart(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) {
+        console.error('Product not found');
+        return;
+    }
+
+    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    cartItems.push(product);
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    displayCart();
+    updateCartCount();
+
+     // 顯示成功的模態框
+     var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+     successModal.show();
+}
+
+function displayCart() {
+    const cartContainer = document.getElementById('cart');
+    cartContainer.innerHTML = '';
+
+    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    cartItems.forEach(item => {
+        const cartItem = createCartItem(item);
+        cartContainer.innerHTML += cartItem;
+    });
+}
+
+function createCartItem(item) {
+    return `
+        <div class="cart-item">
+            <h2>${item.name}</h2>
+            <p>價格: $${item.price}</p>
+        </div>
+    `;
+}
+
+function handleCheckout() {
+    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    if (cartItems.length > 0) {
+        let total = cartItems.reduce((sum, item) => sum + item.price, 0);
+        alert(`總金額: $${total}\n感謝您的購買！`);
+        localStorage.removeItem('cart');
+        displayCart();
+        // 技術規0
+        updateCartCount(0);
+    } else {
+        alert('購物車是空的');
+    }
+}
+
+function updateCartCount() {
+    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    document.getElementById('cartCount').textContent = cartItems.length;
+}
+
+
+// Carousel
+const buttons = document.querySelectorAll("[data-carousel-button]")
 
 buttons.forEach(button => {
     button.addEventListener("click", () => {
         const offset = button.dataset.carouselButton === "next" ? 1 : -1
         const slides = button
             .closest("[data-carousel]")
-            .querySelector('[data-slides]')
+            .querySelector("[data-slides]")
 
         const activeSlide = slides.querySelector("[data-active]")
         let newIndex = [...slides.children].indexOf(activeSlide) + offset
+        if (newIndex < 0) newIndex = slides.children.length - 1
+        if (newIndex >= slides.children.length) newIndex = 0
 
-        // 測試 newIndex 的第一個數值
-        // let unK = [...slides.children].indexOf(activeSlide)
-        // console.log(unK);  // 0 
-
-        // 確保 newIndex 在範圍內
-        if (newIndex < 0) newIndex = slides.children.length - 1;
-        if (newIndex >= slides.children.length) newIndex = 0;
-
-        // 更新活動幻燈片
-        slides.children[newIndex].dataset.active = true;
-        delete activeSlide.dataset.active;
+        slides.children[newIndex].dataset.active = true
+        delete activeSlide.dataset.active
     })
 })
 
 
-// 動態新增商品卡
-document.addEventListener('DOMContentLoaded', () => {
-    fetch('products.json')
-        .then(response => response.json())
-        .then(data => {
-            displayProducts(data);
-        })
-        .catch(error => {
-            console.error('Error fetching product data:', error);
-        });
-});
+// topBtn
+// 當用戶向下滾動 20px 顯示按鈕
+window.onscroll = function() {
+    scrollFunction();
+};
 
-function displayProducts(products) {
-    const container = document.getElementById('product-container');
-    
-    products.forEach(product => {
-        // 创建商品卡元素
-        const article = document.createElement('article');
-        article.classList.add('product-card');
-        
-        // 创建商品图片元素
-        const imgDiv = document.createElement('div');
-        imgDiv.classList.add('product-img');
-        const img = document.createElement('img');
-        img.src = product.image;
-        img.alt = product.name;
-        const imgLink = document.createElement('a');
-        imgLink.href = "#";
-        imgDiv.appendChild(imgLink).appendChild(img);
-        
-        // 创建商品信息元素
-        const productNameDiv = document.createElement('div');
-        productNameDiv.classList.add('product-info');
-        
-        const nameLink = document.createElement('a');
-        nameLink.href = "#";
-        nameLink.classList.add('product-name');
-        nameLink.textContent = product.name;
-        
-        const priceLink = document.createElement('a');
-        priceLink.href = "#";
-        priceLink.classList.add('product-price');
-        priceLink.textContent = `NT$${product.price}`;
-        
-        const sellerLink = document.createElement('a');
-        sellerLink.href = "#";
-        sellerLink.classList.add('product-seller');
-        sellerLink.textContent = product.seller;
-        
-        // 将信息元素添加到商品信息容器中
-        productNameDiv.appendChild(nameLink);
-        productNameDiv.appendChild(priceLink);
-        productNameDiv.appendChild(sellerLink);
-        
-        // 将图片和商品信息添加到商品卡中
-        article.appendChild(imgDiv);
-        article.appendChild(productNameDiv);
-        
-        // 将商品卡添加到容器中
-        container.appendChild(article);
+function scrollFunction() {
+    const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        scrollToTopBtn.style.display = "block";
+    } else {
+        scrollToTopBtn.style.display = "none";
+    }
+}
+
+// 當用戶點擊按鈕時，平滑滾動回到頁面的頂部
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
     });
 }
 
+
+function openCart() {
+    var offcanvasCart = new bootstrap.Offcanvas(document.getElementById('offcanvasCart'));
+    offcanvasCart.show();
+}
+
+
+function isUserLoggedIn() {
+    // 假設這裡檢查用戶的登錄狀態，返回布爾值
+    // 這裡可以檢查 cookie, localStorage, session 或其他方法來確認用戶是否已登錄
+    return localStorage.getItem('loggedIn') === 'true';
+}
