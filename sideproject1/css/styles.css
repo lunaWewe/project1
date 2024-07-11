@@ -352,3 +352,26 @@ a:active {
   transform: scale(1);
   /* 恢復原來大小 */
 }
+
+
+#checkout {
+  background-color: #444040; /* 綠色背景 */
+  color: white; /* 白色文字 */
+  padding: 10px 15px; /* 內邊距 */
+  border: none; /* 無邊框 */
+  border-radius: 5px; /* 圓角 */
+  font-size: 18px; /* 字體大小 */
+  font-weight: bold; /* 字體粗細 */
+  cursor: pointer; /* 鼠標變為手型 */
+  transition: background-color 0.3s, transform 0.3s; /* 過渡效果 */
+}
+
+#checkout:hover {
+  background-color: #dfdfdffd; /* 懸停時背景變深 */
+
+}
+
+#checkout:active {
+  background-color: #000000; /* 點擊時背景更深 */
+
+}
