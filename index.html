@@ -121,8 +121,8 @@
                     aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
-                <div>
-                    <div id="cart"></div>
+                <div class="row">
+                    <div class="col" id="cart"></div>
 
                     <button id="checkout">結帳</button>
 
@@ -153,7 +153,6 @@
             </div>
 
         </section>
-
 
         <section>
             <div class="container-fluid">
@@ -189,15 +188,15 @@
 
                             <ul class="aside-Items ">
                                 <li class="aside-item">
-                                    <input type="radio" name="job" id="student">
+                                    <input type="radio" name="priceHL" id="bl300">
                                     <label for="student">NT$300 以下</label>
                                 </li>
                                 <li class="aside-item">
-                                    <input type="radio" name="job" id="teacher">
+                                    <input type="radio" name="priceHL"id="bt300500">
                                     <label for="teacher">NT$300-500 以下</label>
                                 </li>
                                 <li class="aside-item">
-                                    <input type="radio" name="job" id="other">
+                                    <input type="radio" name="priceHL" id="over500">
                                     <label for="other">NT$500 以上</label>
                                 </li>
 
@@ -281,6 +280,25 @@
 
             </div>
 
+            <div class="cart-item bg-light m-3">
+                <div class="row d-flex">
+                    <div class="col-3 justify-content-between align-items-center">
+                        <img src="${item.image}" style="width: 80px;">
+                    </div>
+                    <div class="col-9">
+                        <h3>${item.name}</h3>
+                        <div class="row">
+                            <p class="col">數量: ${item.quantity}</p>
+                            <p class="col">價格: NT$${(item.price * item.quantity).toLocaleString()}</p>
+                            <p class="col">
+                                <button onclick="removeFromCart(${item.id})" class="btn btn-danger btn-sm" style="padding-left: ;">移除</button>
+                            </p>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </section>
 
 
@@ -319,7 +337,7 @@
                 </div>
 
                 <div class="col mb-3">
-                   
+
                 </div>
 
                 <div class="col mb-3">

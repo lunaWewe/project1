@@ -45,7 +45,7 @@ function displayProducts(products, container) {
 }
 
 function createProductCard(product) {
-    const formattedPrice = product.price.toLocaleString(); // 添加逗号格式
+    const formattedPrice = product.price.toLocaleString();
     return `
         <article class="product-card">
             <div class="product-img">
@@ -78,7 +78,6 @@ function sortProductsByPrice(products, sortOrder) {
     displayProducts(products, document.getElementById('product-container'));
 }
 
-
 // 購物車
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
@@ -88,7 +87,15 @@ function addToCart(productId) {
     }
 
     let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-    cartItems.push(product);
+    const cartItem = cartItems.find(item => item.id === product.id);
+
+    if (cartItem) {
+        cartItem.quantity += 1;
+    } else {
+        product.quantity = 1;
+        cartItems.push(product);
+    }
+
     localStorage.setItem('cart', JSON.stringify(cartItems));
     displayCart();
     updateCartCount();
@@ -112,22 +119,43 @@ function displayCart() {
 function createCartItem(item) {
     const formattedPrice = item.price.toLocaleString(); // 添加逗号格式
     return `
-        <div class="cart-item">
-            <h2>${item.name}</h2>
-            <p>價格: $${formattedPrice}</p>
-        </div>
+            <div class="cart-item d-flex">
+                <div class="row w-100">
+                    <div class="col-3 d-flex align-items-center justify-content-center">
+                        <img src="${item.image}" style="width: 80px;" >
+                    </div>
+                    <div class="col-9 justify-content-between align-items-center">
+                        <h4>${item.name}</h4>
+                        <div class="row">
+                            <p class="col-1"></p>
+                            <p class="col-3">數量: <br>${item.quantity}</p>
+                            <p class="col-4">價格: NT$${(item.price * item.quantity).toLocaleString()}</p>
+                            <div class="col  d-flex align-items-center justify-content-center">
+                                <button onclick="removeFromCart(${item.id})" class="btn btn-danger btn-sm">移除</button>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
     `;
+}
+    function removeFromCart(productId) {
+        let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+        cartItems = cartItems.filter(item => item.id !== productId);
+        localStorage.setItem('cart', JSON.stringify(cartItems));
+        displayCart();
+        updateCartCount();
 }
 
 function handleCheckout() {
     let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
     if (cartItems.length > 0) {
-        let total = cartItems.reduce((sum, item) => sum + item.price, 0).toLocaleString(); // 添加逗号格式
-        alert(`總金額: $${total}\n感謝您的購買！`);
+        let total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toLocaleString(); // 添加逗号格式
+        alert(`總金額: NT$${total}\n感謝您的購買！`);
         localStorage.removeItem('cart');
         displayCart();
-        // 技術規0
-        updateCartCount(0);
+        updateCartCount();
     } else {
         alert('購物車是空的');
     }
@@ -135,9 +163,8 @@ function handleCheckout() {
 
 function updateCartCount() {
     let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-    document.getElementById('cartCount').textContent = cartItems.length;
+    document.getElementById('cartCount').textContent = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 }
-
 
 // Carousel
 const buttons = document.querySelectorAll("[data-carousel-button]")
@@ -158,7 +185,6 @@ buttons.forEach(button => {
         delete activeSlide.dataset.active
     })
 })
-
 
 // topBtn
 // 當用戶向下滾動 20px 顯示按鈕
@@ -183,12 +209,10 @@ function scrollToTop() {
     });
 }
 
-
 function openCart() {
     var offcanvasCart = new bootstrap.Offcanvas(document.getElementById('offcanvasCart'));
     offcanvasCart.show();
 }
-
 
 function isUserLoggedIn() {
     // 假設這裡檢查用戶的登錄狀態，返回布爾值
