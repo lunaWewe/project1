@@ -119,33 +119,66 @@ function displayCart() {
 function createCartItem(item) {
     const formattedPrice = item.price.toLocaleString(); // 添加逗号格式
     return `
-            <div class="cart-item d-flex">
+         <div class="cart-item d-flex">
                 <div class="row w-100">
                     <div class="col-3 d-flex align-items-center justify-content-center">
-                        <img src="${item.image}" style="width: 80px;" >
+                        <img src="${item.image}" style="width: 80px;">
                     </div>
                     <div class="col-9 justify-content-between align-items-center">
                         <h4>${item.name}</h4>
-                        <div class="row">
-                            <p class="col-1"></p>
-                            <p class="col-3">數量: <br>${item.quantity}</p>
-                            <p class="col-4">價格: NT$${(item.price * item.quantity).toLocaleString()}</p>
-                            <div class="col  d-flex align-items-center justify-content-center">
-                                <button onclick="removeFromCart(${item.id})" class="btn btn-danger btn-sm">移除</button>
+                        <div class="row w-100">
+                            <div class="col-8 d-flex align-items-center">
+                                數量:
+                                <div class="input-group input-group-sm  mx-2">
+                                    <button onclick="decreaseQuantity(${item.id})" class="btn btn-secondary btn-sm">-</button>
+                                    <input type="text" class="form-control text-center" value="${item.quantity}" readonly style="max-width: 50px;">
+                                    <button onclick="increaseQuantity(${item.id})" class="btn btn-secondary btn-sm">+</button>
+                                </div>
                             </div>
-                            
-                        </div>
-                    </div>
-                </div>
+                            <p class="col-4">價格: NT$${(item.price * item.quantity).toLocaleString()}</p>
+                            <div class=" d-flex align-items-end justify-content-end">
+                            </div>
+                            </div>
+                            </div>
+                            </div>
+                <button onclick="removeFromCart(${item.id})" class="btn btn-danger btn-sm m-3">移除</button>
             </div>
     `;
 }
-    function removeFromCart(productId) {
-        let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+function increaseQuantity(productId) {
+    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartItem = cartItems.find(item => item.id === productId);
+
+    if (cartItem) {
+        cartItem.quantity += 1;
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    displayCart();
+    updateCartCount();
+}
+
+function decreaseQuantity(productId) {
+    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartItem = cartItems.find(item => item.id === productId);
+
+    if (cartItem && cartItem.quantity > 1) {
+        cartItem.quantity -= 1;
+    } else if (cartItem && cartItem.quantity === 1) {
         cartItems = cartItems.filter(item => item.id !== productId);
-        localStorage.setItem('cart', JSON.stringify(cartItems));
-        displayCart();
-        updateCartCount();
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    displayCart();
+    updateCartCount();
+}
+
+function removeFromCart(productId) {
+    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    cartItems = cartItems.filter(item => item.id !== productId);
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    displayCart();
+    updateCartCount();
 }
 
 function handleCheckout() {
@@ -188,7 +221,7 @@ buttons.forEach(button => {
 
 // topBtn
 // 當用戶向下滾動 20px 顯示按鈕
-window.onscroll = function() {
+window.onscroll = function () {
     scrollFunction();
 };
 
