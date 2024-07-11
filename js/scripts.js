@@ -45,6 +45,7 @@ function displayProducts(products, container) {
 }
 
 function createProductCard(product) {
+    const formattedPrice = product.price.toLocaleString(); // 添加逗号格式
     return `
         <article class="product-card">
             <div class="product-img">
@@ -52,7 +53,7 @@ function createProductCard(product) {
             </div>
             <div class="product-info">
                 <a href="#" class="product-name">${product.name}</a>
-                <a href="#" class="product-price">NT$${product.price}</a>
+                <a href="#" class="product-price">NT$${formattedPrice}</a>
                 <a href="#" class="product-seller">${product.seller}</a>
                 <button class="TocartBtn" onclick="addToCart(${product.id})">加入購物車</button>
             </div>
@@ -92,9 +93,9 @@ function addToCart(productId) {
     displayCart();
     updateCartCount();
 
-     // 顯示成功的模態框
-     var successModal = new bootstrap.Modal(document.getElementById('successModal'));
-     successModal.show();
+    // 顯示成功的模態框
+    var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    successModal.show();
 }
 
 function displayCart() {
@@ -109,10 +110,11 @@ function displayCart() {
 }
 
 function createCartItem(item) {
+    const formattedPrice = item.price.toLocaleString(); // 添加逗号格式
     return `
         <div class="cart-item">
             <h2>${item.name}</h2>
-            <p>價格: $${item.price}</p>
+            <p>價格: $${formattedPrice}</p>
         </div>
     `;
 }
@@ -120,7 +122,7 @@ function createCartItem(item) {
 function handleCheckout() {
     let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
     if (cartItems.length > 0) {
-        let total = cartItems.reduce((sum, item) => sum + item.price, 0);
+        let total = cartItems.reduce((sum, item) => sum + item.price, 0).toLocaleString(); // 添加逗号格式
         alert(`總金額: $${total}\n感謝您的購買！`);
         localStorage.removeItem('cart');
         displayCart();
