@@ -10,5 +10,6 @@
     { "id": 9, "name": "Designer Rug", "price": 4999, "seller": "Iwee", "image": "images\\product\\9.jpg" },
     { "id": 10, "name": "Art Deco Mirror", "price": 3499, "seller": "Jwee", "image": "images\\product\\10.jpg" },
     { "id": 11, "name": "Leather Office Chair", "price": 7999, "seller": "Kwee", "image": "images\\product\\11.jpg" },
-    { "id": 12, "name": "Scandinavian Bookshelf", "price": 4599, "seller": "Lwee", "image": "images\\product\\12.jpg" }
+    { "id": 12, "name": "Scandinavian Bookshelf", "price": 4599, "seller": "Lwee", "image": "images\\product\\12.jpg" },
+    { "id": 13, "name": "酷魚", "price": 13888, "seller": "瑋於·羌園", "image": "images\\product\\13.jpg", "sellerHref":"https://lunawewe.github.io/Fish-Education-Website/" }
 ]

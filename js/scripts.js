@@ -54,7 +54,7 @@ function createProductCard(product) {
             <div class="product-info">
                 <a href="#" class="product-name">${product.name}</a>
                 <a href="#" class="product-price">NT$${formattedPrice}</a>
-                <a href="#" class="product-seller">${product.seller}</a>
+                <a href="${product.sellerHref}" class="product-seller">${product.seller}</a>
                 <button class="TocartBtn" onclick="addToCart(${product.id})">加入購物車</button>
             </div>
         </article>
