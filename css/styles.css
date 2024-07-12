@@ -250,7 +250,7 @@ a:active {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  width: 100%;
+  width: calc(33.33%);
   max-width: 300px;
   text-align: center;
   transition: transform 0.2s;
@@ -276,18 +276,6 @@ a:active {
   margin: 5px 0;
   text-decoration: none;
   color: #000000;
-}
-
-@media (min-width: 600px) {
-  .product-card {
-      width: calc(50% - 20px);
-  }
-}
-
-@media (min-width: 900px) {
-  .product-card {
-      width: calc(33.33% - 20px);
-  }
 }
 
 .productName a:hover {
@@ -318,6 +306,17 @@ a:active {
   transform: scale(1.02);
 }
 
+@media (min-width: 600px) {
+  .product-card {
+      width: calc(50% - 20px);
+  }
+}
+
+@media (min-width: 900px) {
+  .product-card {
+      width: calc(33.33% - 20px);
+  }
+}
 
 #cartBtn {
   position: fixed;
